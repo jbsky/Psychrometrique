@@ -1,21 +1,7 @@
 /*
-Rapport de mélange : r : [Kg/Kg] ou teneur en humidité [kgeau/kgair-sec]
-Mv/Ma 0.622
 
-r = mv / ma
-r = Mv/Ma * e'/(p-e') = Mv/Ma * pv/(p-pv)
-pv ou e' 	 : la pression partielle de la vapeur d'eau ;
-p 	 : la pression absolue.
-
-pv=Hygrometrie/100*pvst
-Pvs : pression de vapeur saturante
-Pvs=pv*100/Hygrometrie
 
 m/V = P*M/(T*R) => density The absolute humidity is just the density of water vapor,
-
-Soit la teneur en humidité
-r=Mv/Ma * (hr/100*pvst)/(p-(hr/100*pvst))
-
 P*V=nRT avec m/M=n
 
 Soit x la fraction molaire
@@ -86,6 +72,13 @@ m : mass en Kg et M : mass molaire g/molaire
         Pvs(T) = pvap : équilibre ;
         pvap > Pvs(T) : condensation.
 */
+
+/* Compatibilité Internet Explorer */
+if( typeof Math.log10 === undefined ){
+    Object.prototype.log10 = function(n){
+        return Math.log(n)/Math.log(10);
+    }
+}
 //-----------------------------------------------------------------------------
 function Psychrometrics() {
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,7 +151,7 @@ function Psychrometrics() {
 
         return P0*Math.exp(L0*this.MassMolaireEau/Rgas*(1/T0-1/(T+273.15)));
     }
-/** 
+/**
 Energie Interne
 dU = Q + W
 Q : Chaleur
@@ -221,47 +214,104 @@ Cpv = 1.835 - 7.34 *Math.pow(10,-4)*T;
 
     }
 	this.calcTfromPvs = function (Pvs){	return calcTfromPvsAutre(Pvs);}
-	
-// Return [T] sec en °C
-// Reverse du calcul de la Vapeur Saturation de l'air Méthode sur le Web
+
+/*
+Calcul renversée de la pression de la vapeur de saturation de l'air
+Méthode Autre
+    @PARAM Humidité Relative : % []
+    @PARAM R le rapport de mélange eau/air sec [kg/kg]
+    @RETURN T la température du bulbe sec [C°]
+*/
     this.calcTsecAutre = function(HR,R){
         if(R<0)
           R=0;//  return 0;
         Pvs=100*R*this.Pression/((this.RapportMolaireEauSurAir+R)*HR);
         return 1730.63/(8.07131 - Math.log10(0.0075*Pvs)) - 233.426;
     }
+    /*
+    * @RETURN Pvs la pression de vapeur saturante, possibilité de switch entre Claperon ou une autre formule
+    *         @PARAM T la Température du bulbe sèc [C°]
+    */
+    this.calcPvs = function (T) {
+        return AutrePvs(T);
+    }
 
-// Entrée
-// HR % :
-// R    :  rapport masse eau sur mass mair    [Kg/Kg]
-// Retour [T] sec en °C
-// Reverse du calcul de la Vapeur Saturation de l'air Méthode Clapeyron
+    /*
+    Calcul renversée de la pression de la vapeur de saturation de l'air  A TESTER
+    Méthode Clapeyron
+        @PARAM Humidité Relative %
+        @PARAM R le rapport de mélange eau/air sec [kg/kg]
+        @RETURN T la Température du bulbe sèc [C°]
+    */
     this.calcTsecClapeyron = function(HR,R){
         Pvs=100*R*this.Pression/((this.RapportMolaireEauSurAir+R)*HR);
         return 1/(1/T0-(Rgas/this.MassMolaireEau)/L*Math.log(this.Pression/100/P0));
     }
-
-    this.calcPvs = function (T) {
-        return Pvs = AutrePvs(T);
-   }
-
-    this.calcR = function(HR,T){
-        //à-15 et 100% HR?
+    /*
+    Rapport de mélange ou teneur en humidité
+    @FORMULE    =>  R=Mv/Ma * Pv/(P-Pv)
+                =>  Pv = HR/100*Pvs
+    Mv/Ma le rapport Molaire Eau/Air,
+    Pv la pression de vapeur [Pa],
+    Pvs la pression de vapeur saturante [Pa],
+    P la pression absolue [Pa]
+    @PARAM HR l'humidité relative %
+    @PARAM T la température du bulbe sec [°C]
+    @RETURN R le rapport de mélange eau/air sec [kg/kg]
+    */
+    this.calcR = function(HR,T,P){
+        if(P===undefined)
+            P=this.Pression;
         var Pvs = this.calcPvs(T);
         var Pv= HR/100*Pvs;
-        return this.RapportMolaireEauSurAir * Pv/(this.Pression-Pv);
+        return this.RapportMolaireEauSurAir * Pv/(P - Pv);
     }
-	
-	this.calcRsat = function(T){
-        //à-15 et 100% HR?
-        var Pvs = this.calcPvs(T);
-        return this.RapportMolaireEauSurAir * Pvs/(this.Pression-Pvs);
-    }
+    /*
+    Humidité Relative %
+    @FORMULE    =>
+    @PARAM R la teneur en humidité [Kg/Kg]
+    @PARAM T la température du bulbe sec [°C]
+    @PARAM P la pression absolue [Pa]
+    @RETURN HR Humidité Relative %
+    */
 
+    this.calcHR = function (R,T,P){
+        if(P===undefined)
+            P=this.Pression;
+        return 100*(P*R/(this.RapportMolaireEauSurAir+R))/this.calcPvs(T);
+    }
+    /*
+    Pression de vapeur saturante
+    @PARAM R : Rapport de mélange eau/air sec [kg/kg]
+    @PARAM Humidité Relative : % []
+    @RETURN [Pa]
+    */
     this.calcPvstFromRHR = function (R,HumiditeRelative){
         return this.Pression/(this.RapportMolaireEauSurAir*HumiditeRelative/(100*R)+HumiditeRelative/100);
-
     }
+
+    /*
+    Humidité spécifique                                             TODO à tester
+    FORMULE =>  Vs = R * T[Kelvin]/(Mv*P)*(Mv/Maisec+R)
+
+    @PARAM R : Rapport de mélange eau/air sec [kg/kg]
+    @PARAM T : Température [C°]
+    @PARAM P : Pression absolue, soit pression atmosphérique [Pa]
+    @RETURN [m3/kg]
+    */
+    this.calcVs = function (R, T, P){
+        if(P===undefined)
+            P = this.Pression;
+        return Rgas*(T+273.15)/(this.MassMolaireEau*this.Pression)*(this.RapportMolaireEauSurAir + R);
+    }
+    /*
+    Calcul de la température du bulbe sèc
+    FORMULE => H = Cpa *T   + r * (L0 + Cpv *T )
+    @PARAM H l'enthalpie [kJ/kg]
+    @PARAM T : Température [C°]
+    @PARAM R la teneur en humidité [Kg/Kg]
+    @RETURN T la température du bulbe sèc[C°]
+    */
     this.calcTsecDepuisEnthalpie = function (Enthalpie,r){
       //  HumiditeRelative
         _Cpa=Cpa.call(this);
@@ -280,14 +330,6 @@ Cpv = 1.835 - 7.34 *Math.pow(10,-4)*T;
     this.calcRapportMassEauAir = function(Enthalpie,T){
         return (Enthalpie-Cpa(T)*T)/(L0 + Cpv(T)*T) ;
     }
-
-    this.calcHR = function (R,T,P){
-        if(P===undefined)
-            P=this.Pression;
-        return 100*(P*R/(this.RapportMolaireEauSurAir+R))/this.calcPvs(T);
-    }
-
-
     // Calcul Interne
     var getPvs= function (){ this.Pvs= AutrePvs(this.Tsec);                                                  }
     var getHR = function (){ this.HR = 100*(this.Pression*this.R/(this.RapportMolaireEauSurAir+this.R))/this.Pvs;     }

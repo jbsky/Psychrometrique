@@ -285,7 +285,7 @@ function graphique (Psychrometrique){
 
             X = new point(T,0);
 
-            R = Psychro.calcR(100,T)*1000;
+            R = Psychrometrique.calcR(100,T)*1000;
             if (R > this.Ymax)
                 R = this.Ymax;
 
@@ -310,7 +310,7 @@ function graphique (Psychrometrique){
         this.drawLineGraph(X,Y,'#0000ff');// tracer vertical
         for(var R = this.Ymin;R <= this.Ymax; R+=step) {
             // Objectif avoir Tsec avec HR=100% pour Kgeau/Kgair = (i)
-            Tsec  = Psychro.calcTsecAutre(100,R/1000);
+            Tsec  = Psychrometrique.calcTsecAutre(100,R/1000);
             if (Tsec < this.Xmin)
                 Tsec = this.Xmin;
             if (Tsec > this.Xmax)
@@ -331,7 +331,7 @@ function graphique (Psychrometrique){
     this.getPos = function (e,id){
         var x=e.clientX-this.canvas.offsetLeft+ document.body.scrollLeft + document.documentElement.scrollLeft;
         var y=e.clientY-this.canvas.offsetTop + document.body.scrollTop + document.documentElement.scrollTop;
-        cursor="(" + String(this.GraphtoX(x).toFixed(2))+"/"+String(tocm(this.canvas.clientWidth).toFixed(2)) + "," + String(this.GraphtoY(y).toFixed(2))+")" ;
+        cursor=String(this.GraphtoX(x).toFixed(2))+"°C," + String(this.GraphtoY(y).toFixed(2))+" g/Kg" ;
         document.getElementById(id).innerHTML=cursor;
     }
 
@@ -371,17 +371,15 @@ function graphique (Psychrometrique){
         }
     };
 
-    /* TODO Calcul de convertion du dessin <=> axe X */
     this.GraphtoX=function(X){
-        /* TODO : Return the correct X from Graph   0       -> this.canvas.clientWidth
-                                                    Xmin    -> Xmax
-        */
-        return X;
+        var _Rapport = this.canvas.clientWidth/(this.Xmax-this.Xmin);
+        return ((X )/_Rapport-this.Origin.x)*ReductionImage+this.Xmin-0.7;
     }
 
-    /* TODO Calcul de convertion du dessin <=> axe Y */
     this.GraphtoY=function(Y){
-        return Y;
+        var _Rapport = this.canvas.clientHeight/(this.Ymax-this.Ymin);
+        return ((this.canvas.clientHeight - Y )/_Rapport-this.Origin.y)*ReductionImage+this.Ymin-0.7;
+        //return Y;
     }
 
     this.drawPointGraph = function (Point,color,width ) {
