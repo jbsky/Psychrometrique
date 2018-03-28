@@ -1,93 +1,173 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <link rel="stylesheet" href="style.css" >
-	<meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
     <title>Psychrométrique</title>
     <script type="text/javascript" src="psychrometric.js"></script>
     <script type="text/javascript" src="graphique.js"></script>
     <script>
-        function getPos(e){
-            x=e.clientX;
-            y=e.clientY;
-            cursor="Your Mouse Position Is : " + x + " and " + y ;
-            document.getElementById("log").innerHTML=cursor;
-            Graph.getPos(e,"log");
+        function getPos(e) {
+            x = e.clientX;
+            y = e.clientY;
+            cursor = "Your Mouse Position Is : " + x + " and " + y;
+            document.getElementById("log").innerHTML = cursor;
+            Graph.getPos(e, "log");
         }
+
         var Psychro = new Psychrometrics();
-		var Graph = new graphique(Psychro);
+        var Graph = new graphique(Psychro);
 
         function Calc() {
-                Psychro.setTsec(document.getElementById("Tsec").value);
-                Psychro.setPression(document.getElementById("Pression").value);
-                Psychro.setAltitude(document.getElementById("Altitude").value);
-                switch (document.getElementById("option").value){
-                    case "HR": Psychro.setHR(document.getElementById("HR").value);break;
-                    case "R": Psychro.setR(document.getElementById("R").value);break;
-                }
-                Psychro.calc();
+            Psychro.setTsec(document.getElementById("Tsec").value);
+            Psychro.setAltitude(document.getElementById("Altitude").value);
+            switch (document.getElementById("option").value) {
+                case "HR":
+                    Psychro.setHR(document.getElementById("HR").value);
+                    break;
+                case "R":
+                    Psychro.setR(document.getElementById("R").value);
+                    break;
+            }
+            Psychro.calc();
 
-                document.getElementById("Pvs").value=Psychro.Pvs;
-                document.getElementById("Pv").value=Psychro.Pv;
-                document.getElementById("R").value=Psychro.R;
-                document.getElementById("HR").value=Psychro.HR;
-                document.getElementById("Tsec").value=Psychro.Tsec;
-                document.getElementById("Rapport").innerHTML=Psychro.RapportMolaireEauSurAir;
-                document.getElementById("Enthalpie").value=Psychro.Enthalpie;
+            document.getElementById("Pvs").value = parseFloat(Psychro.Pvs).toFixed(0);
+            document.getElementById("Pv").value = parseFloat(Psychro.Pv).toFixed(0);
+            document.getElementById("R").value = parseFloat(Psychro.R).toFixed(4);
+            document.getElementById("HR").value = parseFloat(Psychro.HR).toFixed(0);
+            document.getElementById("Tsec").value = parseFloat(Psychro.Tsec).toFixed(0);
+            document.getElementById("Rapport").innerHTML = parseFloat(Psychro.RapportMolaireEauSurAir).toFixed(4);
+            document.getElementById("Enthalpie").value = parseFloat(Psychro.Enthalpie).toFixed(0);
+            document.getElementById("Pression").value = parseFloat(Psychro.Pression).toFixed(0);
+
+            Graph.draw("graph");
         }
 
-		function calcMair(){
-			if (parseFloat(document.getElementById("N2").value) + parseFloat(document.getElementById("O2").value) == 100)
-				document.getElementById("Mair").innerHTML = 	(parseFloat(document.getElementById("O2").value)*parseFloat(document.getElementById("MO2").innerHTML) + 
-																parseFloat(document.getElementById("N2").value)*parseFloat(document.getElementById("MN2").innerHTML))/100;
-				document.getElementById("Rapport").innerHTML =	parseFloat(document.getElementById("Meau").innerHTML)/parseFloat(document.getElementById("Mair").innerHTML)	;
-		}
+        function calcMair() {
+            if (parseFloat(document.getElementById("N2").value) + parseFloat(document.getElementById("O2").value) == 100)
+                document.getElementById("Mair").innerHTML = (parseFloat(document.getElementById("O2").value) * parseFloat(document.getElementById("MO2").innerHTML) +
+                    parseFloat(document.getElementById("N2").value) * parseFloat(document.getElementById("MN2").innerHTML)) / 100;
+            document.getElementById("Rapport").innerHTML = parseFloat(document.getElementById("Meau").innerHTML) / parseFloat(document.getElementById("Mair").innerHTML);
+        }
 
     </script>
 </head>
 <body>
 <div style="width: 100%; display: table;">
-<div style="width: 50%; display: table-row;">
-<div style=" display: table-cell;">
-<h1>Masse molaire</h1>
-<div>
-<div class="align"><div>Nom</div><div>Masse Molaire</div><div>%</div></div>
-<div class="align"><div>O2 </div><div id="MO2">32</div><div><input type="text" id="O2" value="20" onchange="calcMair();"></input></div></div>
-<div class="align"><div>N2 </div><div id="MN2">28</div><div><input type="text" id="N2" value="80" onchange="calcMair();"></input></div></div>
-<div class="align"><div>Air </div><div id="Mair"></div><div>g/mol</div></div>
-<div class="align"><div>Eau </div><div id="Meau">18.02</div><div>g/mol</div></div>
-<div class="align"><div>Meau/Mair </div><div id="Rapport"></div><div>g/mol</div></div>
-</div>
-</div>
+    <div style="width: 50%; display: table-row;">
+        <div style=" display: table-cell;">
+            <h1>Masse molaire</h1>
+            <div>
+                <div class="align">
+                    <div>Nom</div>
+                    <div>Masse Molaire</div>
+                    <div>%</div>
+                </div>
+                <div class="align">
+                    <div>O2</div>
+                    <div id="MO2">32</div>
+                    <div><input type="text" id="O2" value="20" onchange="calcMair();"></input></div>
+                </div>
+                <div class="align">
+                    <div>N2</div>
+                    <div id="MN2">28</div>
+                    <div><input type="text" id="N2" value="80" onchange="calcMair();"></input></div>
+                </div>
+                <div class="align">
+                    <div>Air</div>
+                    <div id="Mair"></div>
+                    <div>g/mol</div>
+                </div>
+                <div class="align">
+                    <div>Eau</div>
+                    <div id="Meau">18.02</div>
+                    <div>g/mol</div>
+                </div>
+                <div class="align">
+                    <div>Meau/Mair</div>
+                    <div id="Rapport"></div>
+                    <div>g/mol</div>
+                </div>
+            </div>
+        </div>
         <div style="display: table-cell;">
 
-        <h1>Paramètre Psychrométrique</h1>
-<div class="align"><div>
-    <select name="option" id="option" onchange="upOption();">
-        <option value="R">Humidité Absolue</option>
-        <option value="HR">Humidité Relative</option>
-    </select> </div><div id="dim"><input type="button"  onclick="Calc();" value="Calc" ></input></div><div ><div></div></div>    </div>
-<div>
-<div class="align"><div>Pression atmosphérique  </div><div>[Pa]</div><div><input type="text" id="Pression" value="101325"></input></div></div>
-<div class="align"><div>Altitude                </div><div>[m]</div><div><input type="text" id="Altitude" value="0"></input></div> </div>
-    <div class="align"><div>Temperature du bulbe sec</div><div>[C]</div><div><input type="text" id="Tsec" value="25"></input ></div></div>
-    <div class="align"><div>Pression de vapeur saturante  </div><div>[Pa]              </div><div><input type="text" id="Pvs" value=""></input ></div></div>
-    <div class="align"><div>Pression partielle de vapeur   </div><div>[Pa]              </div><div><input type="text" id="Pv" value=""></input ></div></div>
-    <div class="align"><div>Temperature du bulbe humide</div><div>[C]              </div><div><input type="text" id="Thum" value=""></input ></div></div>
-    <div class="align"><div>Point de rosée    </div><div>[C]              </div><div><input type="text" id="Tros" ></input></div></div>
-    <div class="align"><div>Humidité Relative   </div><div>[%]              </div><div><input type="text" id="HR" value="50"></input></div></div>
-    <div class="align"><div>Humidité Absolue    </div><div>[kgH2O/kgAIR]    </div><div><input type="text" id="R"  value="0.010"></input ></div></div>
-    <div class="align"><div>Enthalpy de l'air sec   </div><div>[kJ/kg]           </div><div><input type="text" id="Enthalpie"></input ></div></div>
-</div></div></div>
-</div><!--style="width: 29.7cm;height: 12cm;" onmouseover="Graph.getPos(event,'log');" onmousemove="Graph.getPos(event,'log');"  -->
+            <h1>Paramètre Psychrométrique</h1>
+            <div>
+                <div>
+                    <select name="option" id="option" onchange="upOption();">
+                        <option value="R">Humidité Absolue</option>
+                        <option value="HR">Humidité Relative</option>
+                    </select></div>
+                <div id="dim"><input type="button" onclick="Calc();" value="Calc"></input></div>
+                <div>
+                    <div></div>
+                </div>
+            </div>
+            <div class="left" id="Param">
+                <div class="align">
+                    <div>Pression atmosphérique</div>
+                    <div>[Pa]</div>
+                    <div><input type="text" id="Pression" value="101325"  readonly="true"></input></div>
+                </div>
+                <div class="align">
+                    <div>Altitude</div>
+                    <div>[m]</div>
+                    <div><input type="text" id="Altitude" value="0"></input></div>
+                </div>
+                <div class="align">
+                    <div>Temperature du bulbe sec</div>
+                    <div>[C]</div>
+                    <div><input type="text" id="Tsec" value="25"></input></div>
+                </div>
+                <div class="align">
+                    <div>Pression de vapeur saturante</div>
+                    <div>[Pa]</div>
+                    <div><input type="text" id="Pvs" value="" readonly="true"></input></div>
+                </div>
+                <div class="align">
+                    <div>Pression partielle de vapeur</div>
+                    <div>[Pa]</div>
+                    <div><input type="text" id="Pv" value="" readonly="true" ></input></div>
+                </div>
+                <div class="align">
+                    <div>Temperature du bulbe humide</div>
+                    <div>[C]</div>
+                    <div><input type="text" id="Thum" value="" readonly="true"></input></div>
+                </div>
+                <div class="align">
+                    <div>Point de rosée</div>
+                    <div>[C]</div>
+                    <div><input type="text" id="Tros" readonly="true"></input></div>
+                </div>
+                <div class="align">
+                    <div>Humidité Relative</div>
+                    <div>[%]</div>
+                    <div><input type="text" id="HR" value="50" pattern="[0-9]{.}"></input></div>
+                </div>
+                <div class="align">
+                    <div>Humidité spécifique</div>
+                    <div>[kgH2O/kgAIR]</div>
+                    <div><input type="text" id="R" value="0.010" pattern="[0-9]{.}"></input></div>
+                </div>
+                <div class="align">
+                    <div>Enthalpy de l'air sec</div>
+                    <div>[kJ/kg]</div>
+                    <div><input type="text" id="Enthalpie" readonly="true"></input></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--style="width: 29.7cm;height: 12cm;" onmouseover="Graph.getPos(event,'log');" onmousemove="Graph.getPos(event,'log');"  -->
 <div id="log">°C,g/Kg</div>
 <canvas id="graph" onmouseover="Graph.getPos(event,'log');" onmousemove="Graph.getPos(event,'log');"></canvas>
 <SCRIPT>
-window.scrollTo(0,document.body.scrollHeight);
+    window.scrollTo(0, document.body.scrollHeight);
 
-document.onload = calcMair();
-document.onload = Calc();
-document.onload = Graph.draw("graph");
+    document.onload = calcMair();
+    document.onload = Calc();
+    document.onload = Graph.draw("graph");
 
 </SCRIPT>
 </body>

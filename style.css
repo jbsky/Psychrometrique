@@ -1,19 +1,26 @@
-.align{
- width: 600px;
-/*border: 2px black solid;
-    height: 22px;*/
+.align {
+    width: 600px;
+    /*border: 2px black solid;
+        height: 22px;*/
 }
 
-.align
-{
-    display: flex;                  /* establish flex container */
-    flex-direction: row;            /* default value; can be omitted */
-    flex-wrap: nowrap;              /* default value; can be omitted */
+.align {
+    display: flex; /* establish flex container */
+    flex-direction: row; /* default value; can be omitted */
+    flex-wrap: nowrap; /* default value; can be omitted */
     justify-content: space-between; /* switched from default (flex-start, see below) */
     /*background-color: lightyellow;*/
 }
+
 .align > div {
     width: 200px;
     height: 20px;
 
+}
+/*Todo DONT WORK!*/
+#Param > input[type="text"] {
+    text-align: right;
+}
+.left > input[type="text"] {
+    text-align: right;
 }
