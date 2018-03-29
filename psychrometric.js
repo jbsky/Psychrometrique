@@ -75,6 +75,8 @@ function Psychrometrics() {
     this.Pvs;
     this.Pv;
     this.TWet;
+    this.Tr;
+    this.Th;
     this.HR; //Humidity Relative
     this.R;// Humidité Absolue
     this.H; // Anthalpie
@@ -137,18 +139,18 @@ function Psychrometrics() {
      pvap > Pvs(T) : condensation.
 
      ⇒ Chaleurs massiques :
-     Vapeur		1.854 = kJ/kg/°C
-     Liquide 	4.1868= kJ/kg/°C
-     Solide 		2.093 = kJ/kg/°C
+     Vapeur        1.854 = kJ/kg/°C
+     Liquide    4.1868= kJ/kg/°C
+     Solide        2.093 = kJ/kg/°C
      ⇒ Chaleurs de vaporisation et de fusion :
      Vaporisation (0 °C) 2501.6 kJ/kg
-     Fusion (0 °C) 		 333.5 kJ/kg
+     Fusion (0 °C)         333.5 kJ/kg
      */
     /*  L0 [kJ/kg] la chaleur latente de vaporisation de l´eau à 0 °C*/
     var L = 2.470 * Math.pow(10, 6);
     var L0 = 2501.6;// kJ / kg;
-
-    var Cp = 1006;                  //J/kg/K ??
+    var Cm = 4.1868;
+    var Cp = 1.006;                  //J/kg/K ??
 
     var Cpa = function (T) {
         if (T === undefined)
@@ -171,14 +173,14 @@ function Psychrometrics() {
     Cpa [kJ/kg] la chaleur massique de l´air sec,
     Cpv [kJ/kg] la chaleur massique de la vapeur d´eau à 0 °C et a pression absolue de 101 325 Pa.
     L0  [kJ/kg] la chaleur latente de vaporisation de l´eau à 0 °C*/
-   this.calcEnthalpie = function (T, r) {
+    this.calcEnthalpie = function (T, r) {
         var _Cpv = Cpv(T);
         var _Cpa = Cpa(T);
         return _Cpa * T + r * (L0 + _Cpv * T);
     }
 
 // Calcul de Vapeur Saturation de l'air [Pa] Méthode sur le Web
-   var AutrePvs = function (T) {
+    var AutrePvs = function (T) {
         // Pression de Vapeur Saturation de l'air [Pa]
         Pvs = 8.07131 - 1730.63 / (233.426 + T);
         if (99 < T && T <= 374)
@@ -188,7 +190,7 @@ function Psychrometrics() {
 
     }
 
-   var calcTfromPvsAutre = function (Pvs) {
+    var calcTfromPvsAutre = function (Pvs) {
         return 1730.63 / (8.07131 - Math.log10(Pvs * 0.0075)) - 233.426;
     }
 
@@ -201,17 +203,17 @@ function Psychrometrics() {
     }
 
     /* Choix entre Claperone ou Autre */
-   this.calcTfromPvs = function (Pvs) {
-        return calcTfromPvsAutre.call(this,Pvs);
+    this.calcTfromPvs = function (Pvs) {
+        return calcTfromPvsAutre.call(this, Pvs);
     }
 
-     /*
-    Calcul renversée de la pression de la vapeur de saturation de l'air  A TESTER
-    Méthode Clapeyron
-        @PARAM Humidité Relative %
-        @PARAM R le rapport de mélange eau/air sec [kg/kg]
-        @RETURN T la Température du bulbe sèc [C°]
-    */
+    /*
+   Calcul renversée de la pression de la vapeur de saturation de l'air  A TESTER
+   Méthode Clapeyron
+       @PARAM Humidité Relative %
+       @PARAM R le rapport de mélange eau/air sec [kg/kg]
+       @RETURN T la Température du bulbe sèc [C°]
+   */
     this.calcTsecClapeyron = function (HR, R) {
         Pvs = 100 * R * this.Pression / ((this.RapportMolaireEauSurAir + R) * HR);
         return 1 / (1 / T0 - (Rgas / this.MassMolaireEau) / L * Math.log(this.Pression / 100 / P0));
@@ -229,6 +231,48 @@ function Psychrometrics() {
     @PARAM T la température du bulbe sec [°C]
     @RETURN R le rapport de mélange eau/air sec [kg/kg]
     */
+    //this.calcFromThTs = function (Tdb, Twb, P){
+    this.calcRFromThTs = function (T, Th, P) {
+        /*
+        ''' Function to calculate humidity ratio [kg H2O/kg air]
+            Given dry bulb and wet bulb temp inputs [degC]
+            ASHRAE Fundamentals handbood (2005)
+                Tdb = Dry bulb temperature [degC]
+                Twb = Wet bulb temperature [degC]
+                P = Ambient Pressure [kPa]
+        '''
+    */
+//        Pws = Sat_press(Twb);
+        Pvs = this.calcPvs(Th);
+        Rsat = this.RapportMolaireEauSurAir * Pvs / (P - Pvs);//        # Equation 23, p6.8
+        if (T >= 0)                                               //  # Equation 35, p6.9
+            return (((L0 - 2.326 * Th) * Rsat - Cpa(T) * (T - Th)) /
+                (2501 + Cpv(T) * T - Cm * Th));
+        else                                  // # Equation 37, p6.9
+            return (((2830 - 0.24 * Th) * Rsat - Cpa(T) * (T - Th)) /
+                (2830 + Cpv(T) * T - 2.1 * Th));
+    }
+    /*
+    Calcul de la température humide
+            Tdb = Dry bulb temperature [degC]
+            RH = Relative humidity ratio [Fraction or %]
+            P = Ambient Pressure [kPa]
+        Uses Newton-Rhapson iteration to converge quickly
+*/
+
+    this.calcTh = function (T, RH, P) {
+        var R = this.calcR(RH, T, P);
+        var Th = T;
+
+//    ' Solves to within 0.001% accuracy using Newton-Rhapson'
+        R1 = this.calcRFromThTs(T, Th, P);
+        while (Math.abs((R1 - R) / R) > 0.00001) {
+            R2 = this.calcRFromThTs(T, Th - 0.001, P);
+            Th = Th - (R1 - R) * 0.001 / (R1 - R2);
+            R1 = this.calcRFromThTs(T, Th, P);
+        }
+        return Th;
+    }
     this.calcR = function (HR, T, P) {
         if (P === undefined)
             P = this.Pression;
@@ -307,9 +351,34 @@ function Psychrometrics() {
         return (Enthalpie - _Cpa * T) / (L0 + _Cpv * T);
     }
 
-    this.calcRapportMassEauAir = function (Enthalpie, T) {
-        return (Enthalpie - Cpa(T) * T) / (L0 + Cpv(T) * T);
+
+    /*
+
+    Point de rosée
+    FORMULE =>  Tr = b * alpha(T,RH)/(a - alpha(T,RH));
+    avec alpha(T,RH) = a * T / ( b + T) + ln RH
+    a = 17,27 et b=237,7 [°C].
+    @PARAM HR                                 Humidité relative
+    @PARAM T    [C°] la Température du bulbe sec
+    @RETURN Tr                 [C°] la température du point de rosée.
+
+*/
+    this.calcTr = function (HR, T) {
+
+        if (0 > T || T > 60)
+            return false;
+
+        if (HR < 0.01 || 100 < HR)
+            return false;
+
+        var a = 17.27;
+        var b = 237.7;
+
+        var alpha = a * T / ( b + T) + Math.log(HR / 100);
+
+        return b * alpha / (a - alpha);
     }
+
 
     this.calc = function () {
         // En premier, toujours la pression de vapeur saturante;
@@ -326,6 +395,8 @@ function Psychrometrics() {
         }
         this.Enthalpie = this.calcEnthalpie(this.Tsec, this.R);
         this.Vs = this.calcVs(this.R, this.Tsec, this.Pression);
+        this.Th = this.calcTh(this.Tsec, this.HR, this.Pression);
+        this.Tr = this.calcTr(this.HR, this.Tsec);
     }
 
 }

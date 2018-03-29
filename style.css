@@ -17,10 +17,11 @@
     height: 20px;
 
 }
-/*Todo DONT WORK!*/
-#Param > input[type="text"] {
-    text-align: right;
+input[type="text"] {
+    width: 60px;
 }
-.left > input[type="text"] {
+
+/*Todo DONT WORK!*/
+.right {
     text-align: right;
 }

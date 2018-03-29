@@ -31,14 +31,17 @@
             }
             Psychro.calc();
 
-            document.getElementById("Pvs").value = parseFloat(Psychro.Pvs).toFixed(0);
-            document.getElementById("Pv").value = parseFloat(Psychro.Pv).toFixed(0);
+            document.getElementById("Pvs").value = parseFloat(Psychro.Pvs).toFixed(2);
+            document.getElementById("Pv").value = parseFloat(Psychro.Pv).toFixed(2);
             document.getElementById("R").value = parseFloat(Psychro.R).toFixed(4);
-            document.getElementById("HR").value = parseFloat(Psychro.HR).toFixed(0);
-            document.getElementById("Tsec").value = parseFloat(Psychro.Tsec).toFixed(0);
+            document.getElementById("HR").value = parseFloat(Psychro.HR).toFixed(2);
+            document.getElementById("Tsec").value = parseFloat(Psychro.Tsec).toFixed(2);
             document.getElementById("Rapport").innerHTML = parseFloat(Psychro.RapportMolaireEauSurAir).toFixed(4);
-            document.getElementById("Enthalpie").value = parseFloat(Psychro.Enthalpie).toFixed(0);
-            document.getElementById("Pression").value = parseFloat(Psychro.Pression).toFixed(0);
+            document.getElementById("Enthalpie").value = parseFloat(Psychro.Enthalpie).toFixed(2);
+            document.getElementById("Pression").value = parseFloat(Psychro.Pression).toFixed(2);
+            document.getElementById("Tr").value = parseFloat(Psychro.Tr).toFixed(2);
+            document.getElementById("Th").value = parseFloat(Psychro.Th).toFixed(2);
+            document.getElementById("Vs").value = parseFloat(Psychro.Vs).toFixed(2);
 
             Graph.draw("graph");
         }
@@ -93,8 +96,8 @@
         <div style="display: table-cell;">
 
             <h1>Paramètre Psychrométrique</h1>
-            <div>
-                <div>
+            <div class="align">
+                <div >
                     <select name="option" id="option" onchange="upOption();">
                         <option value="R">Humidité Absolue</option>
                         <option value="HR">Humidité Relative</option>
@@ -104,56 +107,61 @@
                     <div></div>
                 </div>
             </div>
-            <div class="left" id="Param">
-                <div class="align">
+            <div >
+                <div class="align" >
                     <div>Pression atmosphérique</div>
                     <div>[Pa]</div>
-                    <div><input type="text" id="Pression" value="101325"  readonly="true"></input></div>
+                    <div><input type="text" id="Pression" value="101325"  readonly="true" class="right"></input></div>
                 </div>
                 <div class="align">
                     <div>Altitude</div>
                     <div>[m]</div>
-                    <div><input type="text" id="Altitude" value="0"></input></div>
+                    <div><input type="text" id="Altitude" value="0" class="right"></input></div>
                 </div>
                 <div class="align">
                     <div>Temperature du bulbe sec</div>
                     <div>[C]</div>
-                    <div><input type="text" id="Tsec" value="25"></input></div>
+                    <div><input type="text" id="Tsec" value="25" class="right"></input></div>
                 </div>
                 <div class="align">
                     <div>Pression de vapeur saturante</div>
                     <div>[Pa]</div>
-                    <div><input type="text" id="Pvs" value="" readonly="true"></input></div>
+                    <div><input type="text" id="Pvs" value="" readonly="true" class="right"></input></div>
                 </div>
                 <div class="align">
                     <div>Pression partielle de vapeur</div>
                     <div>[Pa]</div>
-                    <div><input type="text" id="Pv" value="" readonly="true" ></input></div>
+                    <div><input type="text" id="Pv" value="" readonly="true" class="right"></input></div>
                 </div>
                 <div class="align">
                     <div>Temperature du bulbe humide</div>
                     <div>[C]</div>
-                    <div><input type="text" id="Thum" value="" readonly="true"></input></div>
+                    <div><input type="text" id="Th" value="" readonly="true" class="right"></input></div>
                 </div>
                 <div class="align">
                     <div>Point de rosée</div>
                     <div>[C]</div>
-                    <div><input type="text" id="Tros" readonly="true"></input></div>
+                    <div><input type="text" id="Tr" readonly="true" class="right"></input></div>
                 </div>
                 <div class="align">
                     <div>Humidité Relative</div>
                     <div>[%]</div>
-                    <div><input type="text" id="HR" value="50" pattern="[0-9]{.}"></input></div>
+                    <div><input type="text" id="HR" value="50" pattern="[0-9]{.}" class="right"></input></div>
                 </div>
                 <div class="align">
                     <div>Humidité spécifique</div>
                     <div>[kgH2O/kgAIR]</div>
-                    <div><input type="text" id="R" value="0.010" pattern="[0-9]{.}"></input></div>
+                    <div><input type="text" id="R" value="0.010" pattern="[0-9]{.}" class="right"></input></div>
                 </div>
                 <div class="align">
                     <div>Enthalpy de l'air sec</div>
                     <div>[kJ/kg]</div>
-                    <div><input type="text" id="Enthalpie" readonly="true"></input></div>
+                    <div><input type="text" id="Enthalpie" readonly="true" class="right"></input></div>
+                </div>
+                <div class="align">
+                    <div>Volume spécifique</div>
+                    <div>[Kg/m3]</div>
+                    <div><input type="text" id="Vs" readonly="true" class="right"></input></div>
                 </div>
             </div>
         </div>
