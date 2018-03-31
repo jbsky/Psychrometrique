@@ -1,0 +1,16 @@
+[{
+	"label": "Pression", 
+	"valeur":"1024",
+	"dimension":"hPa"
+	},        
+	{
+	"label": "Temperature", 
+	"valeur":"25",
+	"dimension":"C"
+	},       
+	{
+	"label": "Humidité Relative", 
+	"valeur":"50",
+	"dimension":""
+	} 
+]

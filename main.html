@@ -4,56 +4,9 @@
     <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <title>Psychrométrique</title>
-    <script type="text/javascript" src="psychrometric.js"></script>
-    <script type="text/javascript" src="graphique.js"></script>
-    <script>
-        function getPos(e) {
-            x = e.clientX;
-            y = e.clientY;
-            cursor = "Your Mouse Position Is : " + x + " and " + y;
-            document.getElementById("log").innerHTML = cursor;
-            Graph.getPos(e, "log");
-        }
-
-        var Psychro = new Psychrometrics();
-        var Graph = new graphique(Psychro);
-
-        function Calc() {
-            Psychro.setTsec(document.getElementById("Tsec").value);
-            Psychro.setAltitude(document.getElementById("Altitude").value);
-            switch (document.getElementById("option").value) {
-                case "HR":
-                    Psychro.setHR(document.getElementById("HR").value);
-                    break;
-                case "R":
-                    Psychro.setR(document.getElementById("R").value);
-                    break;
-            }
-            Psychro.calc();
-
-            document.getElementById("Pvs").value = parseFloat(Psychro.Pvs).toFixed(2);
-            document.getElementById("Pv").value = parseFloat(Psychro.Pv).toFixed(2);
-            document.getElementById("R").value = parseFloat(Psychro.R).toFixed(4);
-            document.getElementById("HR").value = parseFloat(Psychro.HR).toFixed(2);
-            document.getElementById("Tsec").value = parseFloat(Psychro.Tsec).toFixed(2);
-            document.getElementById("Rapport").innerHTML = parseFloat(Psychro.RapportMolaireEauSurAir).toFixed(4);
-            document.getElementById("Enthalpie").value = parseFloat(Psychro.Enthalpie).toFixed(2);
-            document.getElementById("Pression").value = parseFloat(Psychro.Pression).toFixed(2);
-            document.getElementById("Tr").value = parseFloat(Psychro.Tr).toFixed(2);
-            document.getElementById("Th").value = parseFloat(Psychro.Th).toFixed(2);
-            document.getElementById("Vs").value = parseFloat(Psychro.Vs).toFixed(2);
-
-            Graph.draw("graph");
-        }
-
-        function calcMair() {
-            if (parseFloat(document.getElementById("N2").value) + parseFloat(document.getElementById("O2").value) == 100)
-                document.getElementById("Mair").innerHTML = (parseFloat(document.getElementById("O2").value) * parseFloat(document.getElementById("MO2").innerHTML) +
-                    parseFloat(document.getElementById("N2").value) * parseFloat(document.getElementById("MN2").innerHTML)) / 100;
-            document.getElementById("Rapport").innerHTML = parseFloat(document.getElementById("Meau").innerHTML) / parseFloat(document.getElementById("Mair").innerHTML);
-        }
-
-    </script>
+    <script type="text/javascript" src="CalculPsychrometrique.js"></script>
+    <script type="text/javascript" src="GraphiquePsychrometrique.js"></script>
+    <script type="text/javascript" src="DocumentPsychrometrique.js"></script>
 </head>
 <body>
 <div style="width: 100%; display: table;">
@@ -167,15 +120,11 @@
         </div>
     </div>
 </div>
-<!--style="width: 29.7cm;height: 12cm;" onmouseover="Graph.getPos(event,'log');" onmousemove="Graph.getPos(event,'log');"  -->
 <div id="log">°C,g/Kg</div>
-<canvas id="graph" onmouseover="Graph.getPos(event,'log');" onmousemove="Graph.getPos(event,'log');"></canvas>
+<canvas id="graph" onmouseover="DocumentPsychro.Graph.getPos(event,'log');" onmousemove="DocumentPsychro.Graph.getPos(event,'log');" onclick="DocumentPsychro.OnClick(event);"></canvas>
 <SCRIPT>
     window.scrollTo(0, document.body.scrollHeight);
+    var DocumentPsychro = new DocumentPsychrometrique(document);
 
-    document.onload = calcMair();
-    document.onload = Calc();
-    document.onload = Graph.draw("graph");
-
-</SCRIPT>
+    DocumentPsychro.OnLoad();</SCRIPT>
 </body>
