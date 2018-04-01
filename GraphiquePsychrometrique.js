@@ -370,6 +370,14 @@ function GraphPsychrometrique(Psychrometrique) {
         var x = e.clientX - this.canvas.offsetLeft + document.body.scrollLeft + document.documentElement.scrollLeft;
         var y = e.clientY - this.canvas.offsetTop + document.body.scrollTop + document.documentElement.scrollTop;
         rPoint = new point(this.GraphtoX(x).toFixed(2),this.GraphtoY(y).toFixed(2));
+        var Rsat = Psychrometrique.calcR(100,parseFloat(rPoint.x))*1000;
+
+        var testY = parseFloat(rPoint.y)
+        if( Rsat < testY)
+            return false;
+        if(parseFloat(rPoint.y)== this.Ymax|| parseFloat(rPoint.x)==this.Xmin ||parseFloat(rPoint.x)==this.Xmax||parseFloat(rPoint.y)== this.Ymin)
+            return false;
+
         cursor = String(rPoint.x) + "°C," + String(rPoint.y) + " g/Kg";
         document.getElementById(id).innerHTML = cursor;
         return rPoint;

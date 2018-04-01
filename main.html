@@ -9,122 +9,30 @@
     <script type="text/javascript" src="DocumentPsychrometrique.js"></script>
 </head>
 <body>
-<div style="width: 100%; display: table;">
-    <div style="width: 50%; display: table-row;">
+<div style="display: table;">
+    <div style="display: table-row;">
         <div style=" display: table-cell;">
-            <h1>Masse molaire</h1>
-            <div>
-                <div class="align">
-                    <div>Nom</div>
-                    <div>Masse Molaire</div>
-                    <div>%</div>
-                </div>
-                <div class="align">
-                    <div>O2</div>
-                    <div id="MO2">32</div>
-                    <div><input type="text" id="O2" value="20" onchange="calcMair();"></input></div>
-                </div>
-                <div class="align">
-                    <div>N2</div>
-                    <div id="MN2">28</div>
-                    <div><input type="text" id="N2" value="80" onchange="calcMair();"></input></div>
-                </div>
-                <div class="align">
-                    <div>Air</div>
-                    <div id="Mair"></div>
-                    <div>g/mol</div>
-                </div>
-                <div class="align">
-                    <div>Eau</div>
-                    <div id="Meau">18.02</div>
-                    <div>g/mol</div>
-                </div>
-                <div class="align">
-                    <div>Meau/Mair</div>
-                    <div id="Rapport"></div>
-                    <div>g/mol</div>
-                </div>
-            </div>
+        <div id="MassMolaire">
+
+        </div>
         </div>
         <div style="display: table-cell;">
-
-            <h1>Paramètre Psychrométrique</h1>
-            <div class="align">
-                <div >
-                    <select name="option" id="option" onchange="upOption();">
-                        <option value="R">Humidité Absolue</option>
-                        <option value="HR">Humidité Relative</option>
-                    </select></div>
-                <div id="dim"><input type="button" onclick="Calc();" value="Calc"></input></div>
-                <div>
-                    <div></div>
-                </div>
-            </div>
-            <div >
-                <div class="align" >
-                    <div>Pression atmosphérique</div>
-                    <div>[Pa]</div>
-                    <div><input type="text" id="Pression" value="101325"  readonly="true" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Altitude</div>
-                    <div>[m]</div>
-                    <div><input type="text" id="Altitude" value="0" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Temperature du bulbe sec</div>
-                    <div>[C]</div>
-                    <div><input type="text" id="Tsec" value="25" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Pression de vapeur saturante</div>
-                    <div>[Pa]</div>
-                    <div><input type="text" id="Pvs" value="" readonly="true" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Pression partielle de vapeur</div>
-                    <div>[Pa]</div>
-                    <div><input type="text" id="Pv" value="" readonly="true" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Temperature du bulbe humide</div>
-                    <div>[C]</div>
-                    <div><input type="text" id="Th" value="" readonly="true" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Point de rosée</div>
-                    <div>[C]</div>
-                    <div><input type="text" id="Tr" readonly="true" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Humidité Relative</div>
-                    <div>[%]</div>
-                    <div><input type="text" id="HR" value="50" pattern="[0-9]{.}" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Humidité spécifique</div>
-                    <div>[kgH2O/kgAIR]</div>
-                    <div><input type="text" id="R" value="0.010" pattern="[0-9]{.}" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Enthalpy de l'air sec</div>
-                    <div>[kJ/kg]</div>
-                    <div><input type="text" id="Enthalpie" readonly="true" class="right"></input></div>
-                </div>
-                <div class="align">
-                    <div>Volume spécifique</div>
-                    <div>[Kg/m3]</div>
-                    <div><input type="text" id="Vs" readonly="true" class="right"></input></div>
-                </div>
+            <div id="Calculateur">
             </div>
         </div>
     </div>
 </div>
+<canvas id="Graph" onmouseover="DocumentPsychro.Graph.getPos(event,'log');" onmousemove="DocumentPsychro.Graph.getPos(event,'log');" onclick="DocumentPsychro.OnClick(event);"></canvas>
 <div id="log">°C,g/Kg</div>
-<canvas id="graph" onmouseover="DocumentPsychro.Graph.getPos(event,'log');" onmousemove="DocumentPsychro.Graph.getPos(event,'log');" onclick="DocumentPsychro.OnClick(event);"></canvas>
 <SCRIPT>
     window.scrollTo(0, document.body.scrollHeight);
     var DocumentPsychro = new DocumentPsychrometrique(document);
+    DocumentPsychro.writeCalculateur("Calculateur");
+    DocumentPsychro.Calc();
+    DocumentPsychro.Graph.draw("Graph");
+    DocumentPsychro.getCapteur();
 
-    DocumentPsychro.OnLoad();</SCRIPT>
+    //DocumentPsychro.writeOptionMassMolaire("MassMolaire");
+
+</SCRIPT>
 </body>

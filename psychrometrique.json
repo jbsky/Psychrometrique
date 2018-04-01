@@ -1,16 +1,1 @@
-[{
-	"label": "Pression", 
-	"valeur":"1024",
-	"dimension":"hPa"
-	},        
-	{
-	"label": "Temperature", 
-	"valeur":"25",
-	"dimension":"C"
-	},       
-	{
-	"label": "Humidité Relative", 
-	"valeur":"50",
-	"dimension":""
-	} 
-]
+{"Date":"31/01/1983","Pression":1024,"Temperature":25,"Humidite_Relative":50}
