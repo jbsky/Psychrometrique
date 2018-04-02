@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Psychrométrique</title>
+    <script type="text/javascript" src="CalculPsychrometrique.js"></script>
+    <script type="text/javascript" src="GraphiquePsychrometrique.js"></script>
+    <script type="text/javascript" src="DocumentPsychrometrique.js"></script>
+</head>
+<body>
+<div style="display: table; width: auto;">
+    <div style="display: table-row;">
+        <div style=" display: table-cell;">
+        <h1>Paramètre Psychrométrique</h1>
+        <div class="align">
+        <div id="Calculateur"></div>
+        <div id="ListPoint" class="align"></div>
+        </div></div>
+        <div style="display: table-cell;" >
+
+        </div>
+    </div>
+</div>
+<canvas id="Graph" onmouseover="DocumentPsychro.Graph.getPos(event,'log');" onmousemove="DocumentPsychro.Graph.getPos(event,'log');" onclick="DocumentPsychro.OnClick(event);"></canvas>
+<div id="log">°C,g/Kg</div>
+<SCRIPT>
+    var DocumentPsychro = new DocumentPsychrometrique(document);
+    DocumentPsychro.setListPoint('ListPoint');
+    DocumentPsychro.writeCalculateur("Calculateur");
+    DocumentPsychro.Calc();
+    DocumentPsychro.Graph.draw("Graph");
+    DocumentPsychro.getCapteur();
+    //DocumentPsychro.writeOptionMassMolaire("MassMolaire");
+    window.scrollTo(0, document.body.scrollHeight);
+
+</SCRIPT>
+</body>
