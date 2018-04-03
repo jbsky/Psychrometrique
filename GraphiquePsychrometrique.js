@@ -366,20 +366,30 @@ function GraphPsychrometrique(Psychrometrique) {
         }
     };
 
+    this.logPos = function (e, id){
+        var rPoint = this.getPos(e, id);
+        cursor = String(rPoint.x) + "°C," + String(rPoint.y) + " g/Kg";
+        document.getElementById(id).innerHTML = cursor;
+
+    }
     this.getPos = function (e, id) {
         var x = e.clientX - this.canvas.offsetLeft + document.body.scrollLeft + document.documentElement.scrollLeft;
         var y = e.clientY - this.canvas.offsetTop + document.body.scrollTop + document.documentElement.scrollTop;
-        rPoint = new point(this.GraphtoX(x).toFixed(2),this.GraphtoY(y).toFixed(2));
+        var rPoint = new point(this.GraphtoX(x).toFixed(2),this.GraphtoY(y).toFixed(2));
         var Rsat = Psychrometrique.calcR(100,parseFloat(rPoint.x))*1000;
 
-        var testY = parseFloat(rPoint.y)
-        if( Rsat < testY)
-            return false;
-        if(parseFloat(rPoint.y)== this.Ymax|| parseFloat(rPoint.x)==this.Xmin ||parseFloat(rPoint.x)==this.Xmax||parseFloat(rPoint.y)== this.Ymin)
-            return false;
 
-        cursor = String(rPoint.x) + "°C," + String(rPoint.y) + " g/Kg";
-        document.getElementById(id).innerHTML = cursor;
+        if( Rsat < parseFloat(rPoint.y))
+            rPoint.y = Rsat.toFixed(2);
+        if(parseFloat(rPoint.y)== this.Ymax)
+            rPoint.y = this.Ymax;
+        if(parseFloat(rPoint.x)==this.Xmin )
+            rPoint.x=this.Xmin;
+        if(parseFloat(rPoint.x)==this.Xmax)
+            rPoint.x=this.Xmax;
+        if(parseFloat(rPoint.y)== this.Ymin)
+            rPoint.y= this.Ymin;
+
         return rPoint;
     }
 

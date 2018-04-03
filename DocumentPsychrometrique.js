@@ -100,6 +100,8 @@ function DocumentPsychrometrique(Document) {
         <div class="align"><div><input type="text" id="R" value="'+ String(parseFloat(this.Psychro.R).toFixed(4)) +'" readonly="true"  class="right">               </input></div></div>\
         <div class="align"><div><input type="text" id="Enthalpie" value="'+ String(parseFloat(this.Psychro.Enthalpie).toFixed(2)) +'" readonly="true" class="right"></input></div></div>\
         <div class="align"><div><input type="text" id="Vs" value="'+ String(parseFloat(this.Psychro.Vs).toFixed(2)) +'" readonly="true" class="right">              </input></div></div>\
+        <BR>\
+        <div class="align"><div><input type="button" class="button" value="delete">              </input></div></div>\
         </div>';
         divListPoint.innerHTML += content;
     }
@@ -167,12 +169,11 @@ function DocumentPsychrometrique(Document) {
     }
 
     this.OnClick = function (e) {
-        var x = e.clientX - this.Graph.canvas.offsetLeft + Document.body.scrollLeft + Document.documentElement.scrollLeft;
-        var y = e.clientY - this.Graph.canvas.offsetTop + Document.body.scrollTop + Document.documentElement.scrollTop;
-        rPoint = new point(this.Graph.GraphtoX(x).toFixed(2), this.Graph.GraphtoY(y).toFixed(2));
+
+        var rPoint = this.Graph.getPos(e);
         Document.getElementById("Tsec").value = parseFloat(rPoint.x);
         Document.getElementById("R").value = parseFloat(rPoint.y) / 1000;
-        this.Calc();
+        this.AddPoint();
         this.Graph.drawPointGraph(rPoint, '#FF0000', 25);
     }
 }

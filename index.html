@@ -9,20 +9,21 @@
     <script type="text/javascript" src="DocumentPsychrometrique.js"></script>
 </head>
 <body>
+<h1>Psychrométrie</h1>
 <div style="display: table; width: auto;">
     <div style="display: table-row;">
         <div style=" display: table-cell;">
-        <h1>Paramètre Psychrométrique</h1>
-        <div class="align">
-        <div id="Calculateur"></div>
-        <div id="ListPoint" class="align"></div>
-        </div></div>
+            <div class="align">
+                <div id="Calculateur"></div>
+                <div id="ListPoint" class="align"></div>
+            </div>
+        </div>
         <div style="display: table-cell;" >
 
         </div>
     </div>
 </div>
-<canvas id="Graph" onmouseover="DocumentPsychro.Graph.getPos(event,'log');" onmousemove="DocumentPsychro.Graph.getPos(event,'log');" onclick="DocumentPsychro.OnClick(event);"></canvas>
+<canvas id="Graph" onmouseover="DocumentPsychro.Graph.logPos(event,'log');" onmousemove="DocumentPsychro.Graph.logPos(event,'log');" onclick="DocumentPsychro.OnClick(event);"></canvas>
 <div id="log">°C,g/Kg</div>
 <SCRIPT>
     var DocumentPsychro = new DocumentPsychrometrique(document);
