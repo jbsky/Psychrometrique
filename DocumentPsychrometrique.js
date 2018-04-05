@@ -7,13 +7,19 @@ function DocumentPsychrometrique(Document) {
     var newPathname = "";
 
     var Req = new XMLHttpRequest();
-
+    this.Ajax = new XMLHttpRequest();
     var OptionMassMolaire = false;
 
     var divListPoint ;
     this.setListPoint = function(div){
         divListPoint = Document.getElementById(div);
     }
+    var pathArray = window.location.href.split('/');
+    for (i = 0; i < pathArray.length - 1; i++) {
+        newPathname += pathArray[i];
+        newPathname += "/";
+    }
+    this.URL = newPathname + 'psychrometrique.json';
 
     this.writeOptionMassMolaire = function (div) {
         OptionMassMolaire = true;
@@ -101,13 +107,12 @@ function DocumentPsychrometrique(Document) {
         <div class="align"><div><input type="text" id="Enthalpie" value="'+ String(parseFloat(this.Psychro.Enthalpie).toFixed(2)) +'" readonly="true" class="right"></input></div></div>\
         <div class="align"><div><input type="text" id="Vs" value="'+ String(parseFloat(this.Psychro.Vs).toFixed(2)) +'" readonly="true" class="right">              </input></div></div>\
         <BR>\
-        <div class="align"><div><input type="button" class="button" value="delete">              </input></div></div>\
-        </div>';
+        <div id="aa" class="align"><div id="tt"><input type="button" class="button" value="DELETE ME" onclick="this.parentElement.parentElement.parentElement.remove();" readonly="true" class="right">              </input></div></div>\        </div>';
         divListPoint.innerHTML += content;
     }
 
     var readFile = function (file) {
-        Req.open("GET", file, false);
+        Req.open("GET", file, true);
         Req.send(null);
         if (Req.readyState === 4)
             if (Req.status === 200 || Req.status == 0)
@@ -153,16 +158,8 @@ function DocumentPsychrometrique(Document) {
                 parseFloat(Document.getElementById("N2").value) * parseFloat(Document.getElementById("MN2").innerHTML)) / 100;
         Document.getElementById("Rapport").innerHTML = parseFloat(Document.getElementById("Meau").innerHTML) / parseFloat(Document.getElementById("Mair").innerHTML);
     }
-
     this.getCapteur = function () {
-
-        var pathArray = window.location.href.split('/');
-        for (i = 0; i < pathArray.length - 1; i++) {
-            newPathname += pathArray[i];
-            newPathname += "/";
-        }
-
-        var res = readFile.call(this, newPathname + 'psychrometrique.json');
+        var res = readFile.call(this, this.URL);
         var b = JSON.parse(res);
         var R = this.Psychro.calcR(parseFloat(b.Humidite_Relative), parseFloat(b.Temperature), parseFloat(b.Pression * 100));
         this.Graph.drawPointGraph(new point(b.Temperature, R * 1000), '#001fff', 25);
@@ -177,3 +174,4 @@ function DocumentPsychrometrique(Document) {
         this.Graph.drawPointGraph(rPoint, '#FF0000', 25);
     }
 }
+

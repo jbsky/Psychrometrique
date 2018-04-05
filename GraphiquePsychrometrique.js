@@ -388,7 +388,7 @@ function GraphPsychrometrique(Psychrometrique) {
         if(parseFloat(rPoint.x)==this.Xmax)
             rPoint.x=this.Xmax;
         if(parseFloat(rPoint.y)== this.Ymin)
-            rPoint.y= this.Ymin;
+            rPoint.y= this.Ymin+1;
 
         return rPoint;
     }

@@ -264,7 +264,13 @@ function CalculPsychrometrique() {
         var R = this.calcR(RH, T, P);
         var Th = T;
 
-//    ' Solves to within 0.001% accuracy using Newton-Rhapson'
+        if(T<0)
+            return 0;
+
+        if (RH==0)
+            return 0;
+
+        //    ' Solves to within 0.001% accuracy using Newton-Rhapson'
         R1 = this.calcRFromThTs(T, Th, P);
         while (Math.abs((R1 - R) / R) > 0.00001) {
             R2 = this.calcRFromThTs(T, Th - 0.001, P);
