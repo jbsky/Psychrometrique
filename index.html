@@ -27,27 +27,12 @@
 <div id="log">°C,g/Kg</div>
 <SCRIPT>
     var DocumentPsychro = new DocumentPsychrometrique(document);
-    DocumentPsychro.setListPoint('ListPoint');
+    //DocumentPsychro.setListPoint('ListPoint');
     DocumentPsychro.writeCalculateur("Calculateur");
     DocumentPsychro.Calc();
     DocumentPsychro.Graph.draw("Graph");
     //DocumentPsychro.writeOptionMassMolaire("MassMolaire");
     window.scrollTo(0, document.body.scrollHeight);
-   // setInterval(DocumentPsychro.getCapteur(),1000);
-    setInterval(function() {
-        DocumentPsychro.Ajax.onreadystatechange = function() {
-            if (DocumentPsychro.Ajax.readyState == 4) {
 
-                var b = JSON.parse(DocumentPsychro.Ajax.responseText);
-                var R = DocumentPsychro.Psychro.calcR(parseFloat(b.Humidite_Relative), parseFloat(b.Temperature), parseFloat(b.Pression * 100));
-                if(DocumentPsychro.Graph.context!== undefined){
-                    DocumentPsychro.Graph.draw("Graph");
-                    DocumentPsychro.Graph.drawPointGraph(new point(b.Temperature, R * 1000), '#001fff', 25);
-                }
-            }
-        };
-        DocumentPsychro.Ajax.open("GET", DocumentPsychro.URL , true);
-        DocumentPsychro.Ajax.send();
-    }, 1000);
 </SCRIPT>
 </body>

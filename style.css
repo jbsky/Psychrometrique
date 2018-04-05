@@ -20,6 +20,7 @@ select {
     width: 100px;
 }
 input[type="text"],select{
+    width: 60px;
     display: inline-block;
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
@@ -82,7 +83,10 @@ input[type="text"],select{
     -webkit-transform-origin: 50% 50% 0;
     transform-origin: 50% 50% 0;
 }
-
+select{
+    width: 300px;}
+.button {    width: 30px;
+}
 .button:hover {
    /* height: 20px;*/
     background: #3cb0fd;

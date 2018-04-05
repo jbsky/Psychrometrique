@@ -4,22 +4,30 @@ function DocumentPsychrometrique(Document) {
 
     this.Graph = new GraphPsychrometrique(this.Psychro);
 
-    var newPathname = "";
+    var URL = "";
 
-    var Req = new XMLHttpRequest();
     this.Ajax = new XMLHttpRequest();
+    var CurrentPoint = 0 ;
     var OptionMassMolaire = false;
+    var OptionGraphique = true;
+    var OptionCalcule = true;
+    var optionDivListPoint = false;
 
-    var divListPoint ;
+    this.ListPoint = new Array();
+    this.ListPoint.push({x: 25, y :5}); // Au moins 1 pour la réponse JSON
+
     this.setListPoint = function(div){
         divListPoint = Document.getElementById(div);
+        optionDivListPoint = true;
     }
+
     var pathArray = window.location.href.split('/');
     for (i = 0; i < pathArray.length - 1; i++) {
-        newPathname += pathArray[i];
-        newPathname += "/";
+        URL += pathArray[i];
+        URL += "/";
     }
-    this.URL = newPathname + 'psychrometrique.json';
+
+    this.ResponseJsonFile = URL + 'psychrometrique.json';
 
     this.writeOptionMassMolaire = function (div) {
         OptionMassMolaire = true;
@@ -70,30 +78,23 @@ function DocumentPsychrometrique(Document) {
             <div class="align"><div class="dimension">Pression partielle de vapeur</div><div class="dimension2">[Pa]</div><div><input type="text" id="Pv" value="" readonly="true" class="right"></input></div></div>\
             <div class="align"><div class="dimension">Temperature du bulbe humide</div><div class="dimension2">[C]</div><div><input type="text" id="Th" value="" readonly="true" class="right"></input></div></div>\
             <div class="align"><div class="dimension">Point de rosée</div><div class="dimension2">[C]</div><div><input type="text" id="Tr" readonly="true" class="right"></input></div></div>\
-            <div class="align"><div class="dimension">Humidité Relative</div><div class="dimension2">[%]</div><div><input type="text" id="HR" value="50" pattern="[0-9]{.}" class="right"></input></div></div>\
-            <div class="align"><div class="dimension">Humidité spécifique</div><div class="dimension2">[kgH2O/kgAIR]</div><div><input type="text" id="R" value="0.010" pattern="[0-9]{.}" class="right"></input></div></div>\
+            <div class="align"><div class="dimension">Humidité Relative</div><div class="dimension2">[%]</div><div><input type="text" id="HR" value="50" class="right"></input></div></div>\
+            <div class="align"><div class="dimension">Humidité spécifique</div><div class="dimension2">[kgH2O/kgAIR]</div><div><input type="text" id="R" value="0.010" class="right"></input></div></div>\
             <div class="align"><div class="dimension">Enthalpy de l\'air sec</div><div class="dimension2">[kJ/kg]</div><div><input type="text" id="Enthalpie" readonly="true" class="right"></input></div></div>\
             <div class="align"><div class="dimension">Volume spécifique</div><div class="dimension2">[Kg/m3]</div><div><input type="text" id="Vs" readonly="true" class="right"></input></div></div>\
             <BR>\
-            <div class="align"><div><select class="select" name="option" id="option"><option value="R">Humidité Absolue</option><option value="HR">Humidité Relative</option></select></div><div></div><div><input type="button" onclick="DocumentPsychro.AddPoint(\'ListPoint\');" value="Add Point" class="button"></input></div></div></div>';
+            <div class="align">\
+                <div><select class="select" name="option" id="option"><option value="R">Humidité Absolue</option><option value="HR">Humidité Relative</option></select></div>\
+                <div></div>\
+                <div><input type="button" onclick="DocumentPsychro.PrevPoint();" value="<" class="button"></input><input type="button" id="ButtonDrop" onclick="DocumentPsychro.DropPoint();" value="X" class="button"></input><input type="button" onclick="DocumentPsychro.NextPoint();" value=">" class="button"></input></div></div></div>';
         theDiv.innerHTML = content;
     }
-    this.AddPoint = function () {
-        this.Psychro.setTsec(Document.getElementById("Tsec").value);
-        this.Psychro.setAltitude(Document.getElementById("Altitude").value);
-        switch (Document.getElementById("option").value) {
-            case "HR":
-                this.Psychro.setHR(Document.getElementById("HR").value);
-                break;
-            case "R":
-                this.Psychro.setR(Document.getElementById("R").value);
-                break;
-        }
-        this.Psychro.calc();
-        var  newpoint=  new point(parseFloat(this.Psychro.Tsec), parseFloat(this.Psychro.R) * 1000);
 
-        if(this.Graph.context!== undefined)
-            this.Graph.drawPointGraph(newpoint, '#4eff00', 25);
+    this.AddPoint = function () {
+
+
+
+        if(optionDivListPoint){
         var content = '<div >\
         <div class="align"><div><input type="text" id="Pression" value="'+ String(parseFloat(this.Psychro.Pression).toFixed(0)) +'"  readonly="true" class="right"> </input></div></div>\
         <div class="align"><div><input type="text" id="Altitude" value="'+ String(parseFloat(this.Psychro.Altitude).toFixed(2)) +'" readonly="true" class="right">  </input></div></div>\
@@ -109,15 +110,7 @@ function DocumentPsychrometrique(Document) {
         <BR>\
         <div id="aa" class="align"><div id="tt"><input type="button" class="button" value="DELETE ME" onclick="this.parentElement.parentElement.parentElement.remove();" readonly="true" class="right">              </input></div></div>\        </div>';
         divListPoint.innerHTML += content;
-    }
-
-    var readFile = function (file) {
-        Req.open("GET", file, true);
-        Req.send(null);
-        if (Req.readyState === 4)
-            if (Req.status === 200 || Req.status == 0)
-                return Req.responseText;
-
+        }
     }
 
     this.Calc = function () {
@@ -145,10 +138,6 @@ function DocumentPsychrometrique(Document) {
         Document.getElementById("Tr").value = parseFloat(this.Psychro.Tr).toFixed(2);
         Document.getElementById("Th").value = parseFloat(this.Psychro.Th).toFixed(2);
         Document.getElementById("Vs").value = parseFloat(this.Psychro.Vs).toFixed(2);
-        var  newpoint=  new point(parseFloat(this.Psychro.Tsec), parseFloat(this.Psychro.R) * 1000);
-        if(this.Graph.context!== undefined)
-            this.Graph.drawPointGraph(newpoint, '#4eff00', 25);
-
 
     }
 
@@ -158,11 +147,70 @@ function DocumentPsychrometrique(Document) {
                 parseFloat(Document.getElementById("N2").value) * parseFloat(Document.getElementById("MN2").innerHTML)) / 100;
         Document.getElementById("Rapport").innerHTML = parseFloat(Document.getElementById("Meau").innerHTML) / parseFloat(Document.getElementById("Mair").innerHTML);
     }
-    this.getCapteur = function () {
-        var res = readFile.call(this, this.URL);
-        var b = JSON.parse(res);
-        var R = this.Psychro.calcR(parseFloat(b.Humidite_Relative), parseFloat(b.Temperature), parseFloat(b.Pression * 100));
-        this.Graph.drawPointGraph(new point(b.Temperature, R * 1000), '#001fff', 25);
+
+    this.DrawGraph = function(){
+        if(this.Graph.context!== undefined){
+            DocumentPsychro.Graph.draw("Graph");
+            for (var i=0; i < this.ListPoint.length;i++)
+                this.Graph.drawPointGraph(new point(this.ListPoint[i].x,this.ListPoint[i].y), '#ff0010', 25);
+
+        }
+    }
+
+    this.NextPoint = function(){
+        CurrentPoint++;
+        if(CurrentPoint>=this.ListPoint.length)
+            CurrentPoint = this.ListPoint.length - 1;
+
+
+        if(CurrentPoint == 0)
+            Document.getElementById("ButtonDrop").disabled=true;
+        else
+            Document.getElementById("ButtonDrop").disabled=false;
+
+        Document.getElementById("Tsec").value = parseFloat(this.ListPoint[CurrentPoint].x);
+        Document.getElementById("R").value = parseFloat(this.ListPoint[CurrentPoint].y) / 1000;
+        Document.getElementById("option").value = 'R';
+
+        this.Calc();
+
+    }
+
+    this.DropPoint = function(){
+       // this.ListPoint[CurrentPoint].pop();
+        this.ListPoint.splice(CurrentPoint,1);
+        if(CurrentPoint>=this.ListPoint.length)
+            CurrentPoint = this.ListPoint.length - 1;
+
+        if(CurrentPoint == 0)
+            Document.getElementById("ButtonDrop").disabled=true;
+        else
+            Document.getElementById("ButtonDrop").disabled=false;
+        Document.getElementById("Tsec").value = parseFloat(this.ListPoint[CurrentPoint].x);
+        Document.getElementById("R").value = parseFloat(this.ListPoint[CurrentPoint].y) / 1000;
+        Document.getElementById("option").value = 'R';
+
+        this.Calc();
+
+    }
+
+
+    this.PrevPoint = function(){
+        CurrentPoint--;
+        if(CurrentPoint<=0)
+            CurrentPoint = 0;
+
+        if(CurrentPoint == 0)
+            Document.getElementById("ButtonDrop").disabled=true;
+        else
+            Document.getElementById("ButtonDrop").disabled=false;
+
+        Document.getElementById("Tsec").value = parseFloat(this.ListPoint[CurrentPoint].x);
+        Document.getElementById("R").value = parseFloat(this.ListPoint[CurrentPoint].y) / 1000;
+        Document.getElementById("option").value = 'R';
+
+        this.Calc();
+
     }
 
     this.OnClick = function (e) {
@@ -170,8 +218,29 @@ function DocumentPsychrometrique(Document) {
         var rPoint = this.Graph.getPos(e);
         Document.getElementById("Tsec").value = parseFloat(rPoint.x);
         Document.getElementById("R").value = parseFloat(rPoint.y) / 1000;
-        this.AddPoint();
-        this.Graph.drawPointGraph(rPoint, '#FF0000', 25);
+        Document.getElementById("option").value = 'R';
+        DocumentPsychro.ListPoint.push ({x:parseFloat(rPoint.x), y :parseFloat(rPoint.y)});
+
+        this.Calc();
+        CurrentPoint = this.ListPoint.length-1;
+        this.DrawGraph();
     }
 }
 
+
+// Lecture du fichier JSON en boucle
+setInterval(function() {
+    DocumentPsychro.Ajax.onreadystatechange = function() {
+        if (DocumentPsychro.Ajax.readyState == 4) {
+
+            var b = JSON.parse(DocumentPsychro.Ajax.responseText);
+            var R = DocumentPsychro.Psychro.calcR(parseFloat(b.Humidite_Relative), parseFloat(b.Temperature), parseFloat(b.Pression * 100));
+            if(DocumentPsychro.Graph.context!== undefined){
+                DocumentPsychro.ListPoint[0] = ({x: b.Temperature,y: R * 1000});
+                DocumentPsychro.DrawGraph();
+            }
+        }
+    };
+    DocumentPsychro.Ajax.open("GET", DocumentPsychro.ResponseJsonFile , true);
+    DocumentPsychro.Ajax.send();
+}, 1000);
